@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">MathQuiz</string>
+    <string name="previous_button">Previous</string>
+    <string name="next_button">Next</string>
+    <string name="correct_toast">Correct</string>
+    <string name="incorrect_toast">Incorrect</string>
+    <string name="question_one">1+5</string>
+    <string name="question_two">5+5</string>
+    <string name="question_three">10+3</string>
+    <string name="question_four">5+7</string>
+    <string name="incorrect_one">3</string>
+    <string name="correct_one">6</string>
+    <string name="correct_two">10</string>
+    <string name="incorrect_two">20</string>
+    <string name="incorrect_three">13</string>
+    <string name="correct_three">12</string>
+    <string name="correct_four">12</string>
+    <string name="incorrect_four">11</string>
 </resources>

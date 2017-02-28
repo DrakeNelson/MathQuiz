@@ -1,5 +1,7 @@
 package com.drakenelson.mathquiz;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,20 +13,21 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     Question[] questionses = new Question[]{
-            new Question(R.string.question_one, true,R.string.correct_one,R.string.incorrect_one),
-            new Question(R.string.question_two, true,R.string.correct_two,R.string.incorrect_two),
-            new Question(R.string.question_three, false,R.string.correct_three,R.string.incorrect_three),
-            new Question(R.string.question_four, true,R.string.correct_four,R.string.incorrect_four)
+            new Question(R.string.question_one, true, R.string.correct_one, R.string.incorrect_one),
+            new Question(R.string.question_two, true, R.string.correct_two, R.string.incorrect_two),
+            new Question(R.string.question_three, false, R.string.correct_three, R.string.incorrect_three),
+            new Question(R.string.question_four, true, R.string.correct_four, R.string.incorrect_four)
     };
 
     private static final String TAG = "QuizActivity";
-
-    private int currentIndex = 0;
+    private static final int REQUEST_CODE_CHEAT = 0;
+     private int currentIndex = 0;
     private static final String KEY_INDEX = "index";
 
     private TextView questionView;
     private Button mTrueButton;
     private Button mFalseButton;
+    private Button mCheatButton;
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -49,14 +52,14 @@ public class MainActivity extends AppCompatActivity {
         View mPreButton;
         mPreButton = (ImageButton) findViewById(R.id.previous_button);
 
-        questionView.setOnClickListener(new View.OnClickListener(){
+        questionView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 currentIndex = (currentIndex + 1) % questionses.length;
                 updateQuestion();
             }
         });
-        mTrueButton.setOnClickListener(new View.OnClickListener(){
+        mTrueButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (questionses[currentIndex].isAnswerTrue()) {
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        mFalseButton.setOnClickListener(new View.OnClickListener(){
+        mFalseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!questionses[currentIndex].isAnswerTrue()) {
@@ -76,14 +79,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-        mNextButton.setOnClickListener(new View.OnClickListener(){
+        mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 currentIndex = (currentIndex + 1) % questionses.length;
+                isCheater = false;
                 updateQuestion();
             }
         });
-        mPreButton.setOnClickListener(new View.OnClickListener(){
+        mPreButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 currentIndex = (currentIndex == 0) ? currentIndex = questionses.length - 1 : currentIndex - 1;
@@ -93,7 +97,39 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             currentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
         }
+        mCheatButton = (Button) findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (savedInstanceState != null) {
+                    currentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+                    //Intent i = new Intent(MainActivity.this, CheatActivity.class);
+
+                    boolean answerIsTrue = questionses[currentIndex].isAnswerTrue();
+                    Intent i = CheatActivity.newIntent(MainActivity.this, answerIsTrue);
+
+                    //startActivity(i);
+                    startActivityForResult(i, REQUEST_CODE_CHEAT);
+                }
+            }
+        });
+
         updateQuestion();
+    }
+
+    private boolean isCheater;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        if (requestCode == REQUEST_CODE_CHEAT) {
+            if (data == null) {
+                return;
+            }
+            isCheater = CheatActivity.wasAnswerShown(data);
+        }
     }
 
     private void updateQuestion() {
